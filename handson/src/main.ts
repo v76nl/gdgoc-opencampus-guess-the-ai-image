@@ -152,7 +152,7 @@ terminalInput.addEventListener('keydown', (e) => {
       initPhase2();
       terminalPanel.classList.add('hidden');
       terminalInput.value = '';
-    } else if (val === 'reset') {
+    } else if (val === 'reset' || val === 'back') {
       phase = 1;
       phaseQuiz.classList.remove('hidden');
       phaseAnswer.classList.add('hidden');
