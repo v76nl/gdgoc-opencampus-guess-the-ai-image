@@ -4,14 +4,21 @@ import { parseExif, analyzePixel } from './detector';
 const IMAGES = [
   '/images/image_01.png',
   '/images/image_02.png',
+  '/images/image_03.png',
   '/images/image_04.jpg',
   '/images/image_05.jpg',
+  '/images/image_06.jpg',
   '/images/image_07.jpg',
   '/images/image_08.jpg',
+  '/images/image_09.jpg',
+  '/images/image_10.jpg',
+  '/images/image_11.jpg',
+  '/images/image_12.jpg',
 ];
 
 // State
 let phase: 1 | 2 = 1;
+let isDevMode = false;
 const labels: Record<string, 'AI' | 'Real' | null> = {};
 
 // DOM Elements
@@ -24,6 +31,11 @@ const terminalInput = document.getElementById('terminal-input') as HTMLInputElem
 const phaseQuiz = document.getElementById('phase-quiz') as HTMLDivElement;
 const phaseAnswer = document.getElementById('phase-answer') as HTMLDivElement;
 const scoreDisplay = document.getElementById('score-display') as HTMLHeadingElement;
+const aiCountSpan = document.getElementById('ai-count') as HTMLSpanElement;
+
+// Since 1-6 are AI images
+const aiImagesCount = 6;
+if (aiCountSpan) aiCountSpan.textContent = aiImagesCount.toString();
 
 function initPhase1() {
   quizGrid.innerHTML = '';
@@ -67,7 +79,7 @@ function initPhase2() {
   let correctCount = 0;
 
   IMAGES.forEach((src, index) => {
-    const isAiActual = index < 4; // 0,1,2,3 are AI (0,1 are watermark, 2,3 are exif in our IMAGES array)
+    const isAiActual = index < aiImagesCount;
     const userLabel = labels[src];
     
     if (
@@ -79,12 +91,14 @@ function initPhase2() {
 
     const row = document.createElement('div');
     row.className = 'answer-row';
+    const translatedUserLabel = userLabel === 'AI' ? 'AI' : userLabel === 'Real' ? '本物' : 'なし';
+    const actualLabel = isAiActual ? '(Actual: AI)' : '(Actual: 本物)';
     row.innerHTML = `
       <div class="answer-image">
         <img id="img-${index}" src="${src}" alt="Image ${index + 1}" crossorigin="anonymous" />
       </div>
       <div class="answer-dashboard">
-        <h3>User Label: ${userLabel || 'None'} ${isAiActual ? '(Actual: AI)' : '(Actual: 本物)'}</h3>
+        <h3>あなたの回答: ${translatedUserLabel} ${isDevMode ? actualLabel : ''}</h3>
         
         <div class="dashboard-panel">
           <button class="btn btn-exif">メタデータ解析</button>
@@ -157,6 +171,11 @@ terminalInput.addEventListener('keydown', (e) => {
       phaseQuiz.classList.remove('hidden');
       phaseAnswer.classList.add('hidden');
       initPhase1();
+      terminalPanel.classList.add('hidden');
+      terminalInput.value = '';
+    } else if (val === 'debug' || val === 'dev' || val === 'admin') {
+      isDevMode = true;
+      if (phase === 2) initPhase2();
       terminalPanel.classList.add('hidden');
       terminalInput.value = '';
     }
