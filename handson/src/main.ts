@@ -27,15 +27,25 @@ const answerList = document.getElementById('answer-list') as HTMLDivElement;
 const terminalToggle = document.getElementById('terminal-toggle') as HTMLButtonElement;
 const terminalPanel = document.getElementById('terminal-panel') as HTMLDivElement;
 const terminalInput = document.getElementById('terminal-input') as HTMLInputElement;
+const terminalHistory = document.getElementById('terminal-history') as HTMLDivElement;
 
 const phaseQuiz = document.getElementById('phase-quiz') as HTMLDivElement;
 const phaseAnswer = document.getElementById('phase-answer') as HTMLDivElement;
+const phaseExplain = document.getElementById('phase-explain') as HTMLDivElement;
 const scoreDisplay = document.getElementById('score-display') as HTMLHeadingElement;
 const aiCountSpan = document.getElementById('ai-count') as HTMLSpanElement;
 
 // Since 1-6 are AI images
 const aiImagesCount = 6;
 if (aiCountSpan) aiCountSpan.textContent = aiImagesCount.toString();
+
+function appendHistory(cmd: string, response: string) {
+  const line = document.createElement('div');
+  line.className = 'history-line';
+  line.innerHTML = `<div><span style="font-weight:bold;">$</span> ${cmd}</div><div style="color:#aaa;margin-bottom:8px;">${response}</div>`;
+  terminalHistory.appendChild(line);
+  terminalHistory.scrollTop = terminalHistory.scrollHeight;
+}
 
 function initPhase1() {
   quizGrid.innerHTML = '';
@@ -150,8 +160,8 @@ function initPhase2() {
 
 // Terminal Logic
 terminalToggle.addEventListener('click', () => {
-  terminalPanel.classList.toggle('hidden');
-  if (!terminalPanel.classList.contains('hidden')) {
+  terminalPanel.classList.toggle('open');
+  if (terminalPanel.classList.contains('open')) {
     terminalInput.focus();
   }
 });
@@ -159,26 +169,46 @@ terminalToggle.addEventListener('click', () => {
 terminalInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') {
     const val = terminalInput.value.trim().toLowerCase();
+    if (!val) return;
+    
+    terminalInput.value = '';
+    let response = '';
+    
     if (val === 'answer') {
       phase = 2;
       phaseQuiz.classList.add('hidden');
+      phaseExplain.classList.add('hidden');
       phaseAnswer.classList.remove('hidden');
       initPhase2();
-      terminalPanel.classList.add('hidden');
-      terminalInput.value = '';
+      response = 'Loading Validation Dashboard...';
+      setTimeout(() => terminalPanel.classList.remove('open'), 600);
     } else if (val === 'reset' || val === 'back') {
       phase = 1;
       phaseQuiz.classList.remove('hidden');
       phaseAnswer.classList.add('hidden');
+      phaseExplain.classList.add('hidden');
       initPhase1();
-      terminalPanel.classList.add('hidden');
-      terminalInput.value = '';
+      response = 'Returning to Phase 1...';
+      setTimeout(() => terminalPanel.classList.remove('open'), 600);
+    } else if (val === 'explain') {
+      phaseQuiz.classList.add('hidden');
+      phaseAnswer.classList.add('hidden');
+      phaseExplain.classList.remove('hidden');
+      response = 'Displaying explanation...';
+      setTimeout(() => terminalPanel.classList.remove('open'), 600);
     } else if (val === 'debug' || val === 'dev' || val === 'admin') {
       isDevMode = true;
       if (phase === 2) initPhase2();
-      terminalPanel.classList.add('hidden');
-      terminalInput.value = '';
+      response = 'Switched to Developer mode.';
+    } else if (val === 'user') {
+      isDevMode = false;
+      if (phase === 2) initPhase2();
+      response = 'Switched to User mode.';
+    } else {
+      response = `Command not found: ${val}`;
     }
+    
+    appendHistory(val, response);
   }
 });
 

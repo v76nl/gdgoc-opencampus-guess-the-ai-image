@@ -14,14 +14,29 @@
   </head>
   <body>
     <!-- Terminal toggle button -->
-    <button id="terminal-toggle" class="btn">Terminal</button>
+    <button id="terminal-toggle" class="btn">💻</button>
 
     <!-- Terminal panel -->
-    <div id="terminal-panel" class="hidden">
+    <div id="terminal-panel">
       <div class="terminal-header">Terminal</div>
+      <div id="terminal-history" class="terminal-history"></div>
       <div class="terminal-body">
         <span class="prompt-symbol">$</span>
-        <input type="text" id="terminal-input" autocomplete="off" spellcheck="false" autofocus />
+        <input type="text" id="terminal-input" autocomplete="off" spellcheck="false" />
+      </div>
+    </div>
+
+    <!-- Phase 3: Explain Phase -->
+    <div id="phase-explain" class="phase-container hidden">
+      <div class="header-section">
+        <h1>仕組みの解説</h1>
+        <p class="description">AI画像を見分けるための裏側の仕組み</p>
+      </div>
+      <div class="explain-content" style="padding: 2rem;">
+        <h2>1. ウォーターマーク（拡散スペクトル方式）</h2>
+        <p>画像全体に極小の固定ノイズパターンを加算しています。人間の目には見えませんが、ピクセル配列を解析して相関値として検出可能です。</p>
+        <h2>2. メタデータ（Exif MakerNote）</h2>
+        <p>画像ファイルのヘッダー領域に特定の文字列データを埋め込んでいます。解析ツールを用いることで読み取ることができます。</p>
       </div>
     </div>
 
