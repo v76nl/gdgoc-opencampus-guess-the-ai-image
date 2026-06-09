@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Image Quiz</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <!-- Terminal toggle button -->
+    <button id="terminal-toggle" class="btn">Terminal</button>
+
+    <!-- Terminal panel -->
+    <div id="terminal-panel" class="hidden">
+      <div class="terminal-header">Admin Terminal</div>
+      <div class="terminal-body">
+        <label for="terminal-input">Type command to switch phase:</label>
+        <input type="text" id="terminal-input" placeholder="Type 'answer' to reveal..." />
+      </div>
+    </div>
+
+    <!-- Phase 1: Quiz Phase -->
+    <div id="phase-quiz" class="phase-container">
+      <div class="header-section">
+        <h1>AI Image Quiz</h1>
+        <p class="description">この中に いくつか のAI生成画像が含まれています</p>
+      </div>
+      <div id="quiz-grid" class="image-grid">
+        <!-- Images will be inserted here by main.ts -->
+      </div>
+    </div>
+
+    <!-- Phase 2: Answer Phase -->
+    <div id="phase-answer" class="phase-container hidden">
+      <div class="header-section">
+        <h1>Validation Dashboard</h1>
+        <p class="description">検証ツールを用いて画像を分析します</p>
+        <h2 id="score-display"></h2>
+      </div>
+      <div id="answer-list" class="answer-list">
+        <!-- Validation rows will be inserted here by main.ts -->
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
