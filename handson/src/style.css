@@ -92,29 +92,28 @@ h1, h2, h3, p {
 #terminal-toggle {
   position: absolute;
   top: 50%;
-  left: -60px;
+  left: -40px;
   transform: translateY(-50%);
   z-index: 100;
-  width: 60px;
-  height: 120px;
-  border-radius: 60px 0 0 60px !important;
+  width: 40px;
+  height: 80px;
+  border-radius: 40px 0 0 40px !important;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 24px;
+  font-family: 'Consolas', 'Courier New', monospace;
   padding: 0;
-  border-right: none;
-  transition: all 0.3s ease-in-out;
+  border: none;
+  background-color: var(--itl-black);
+  color: var(--itl-white);
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
 }
 
-#terminal-panel.open #terminal-toggle {
-  top: 0;
-  left: -50px;
-  transform: translateY(0);
-  width: 50px;
-  height: 50px;
-  border-radius: 50% !important;
-  border-right: 2px solid var(--itl-black);
+#terminal-toggle:hover {
+  background-color: var(--itl-red) !important;
+  color: var(--itl-white) !important;
 }
 
 .btn {

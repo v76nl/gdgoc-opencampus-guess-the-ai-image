@@ -165,10 +165,14 @@ function initPhase2() {
   scoreDisplay.textContent = `正答数: ${correctCount} / ${IMAGES.length}`;
 }
 
+const toggleIcon = document.getElementById('toggle-icon') as HTMLSpanElement;
+
 // Terminal Logic
 terminalToggle.addEventListener('click', () => {
   terminalPanel.classList.toggle('open');
-  if (terminalPanel.classList.contains('open')) {
+  const isOpen = terminalPanel.classList.contains('open');
+  toggleIcon.textContent = isOpen ? '>' : '<';
+  if (isOpen) {
     terminalInput.focus();
   }
 });
@@ -188,7 +192,10 @@ terminalInput.addEventListener('keydown', (e) => {
       phaseAnswer.classList.remove('hidden');
       initPhase2();
       response = 'Loading Validation Dashboard...';
-      setTimeout(() => terminalPanel.classList.remove('open'), 600);
+      setTimeout(() => {
+        terminalPanel.classList.remove('open');
+        toggleIcon.textContent = '<';
+      }, 600);
     } else if (val === 'reset' || val === 'back') {
       phase = 1;
       phaseQuiz.classList.remove('hidden');
@@ -196,13 +203,19 @@ terminalInput.addEventListener('keydown', (e) => {
       phaseExplain.classList.add('hidden');
       initPhase1();
       response = 'Returning to Phase 1...';
-      setTimeout(() => terminalPanel.classList.remove('open'), 600);
+      setTimeout(() => {
+        terminalPanel.classList.remove('open');
+        toggleIcon.textContent = '<';
+      }, 600);
     } else if (val === 'explain') {
       phaseQuiz.classList.add('hidden');
       phaseAnswer.classList.add('hidden');
       phaseExplain.classList.remove('hidden');
       response = 'Displaying explanation...';
-      setTimeout(() => terminalPanel.classList.remove('open'), 600);
+      setTimeout(() => {
+        terminalPanel.classList.remove('open');
+        toggleIcon.textContent = '<';
+      }, 600);
     } else if (val === 'debug' || val === 'dev' || val === 'admin') {
       isDevMode = true;
       if (phase === 2) initPhase2();
