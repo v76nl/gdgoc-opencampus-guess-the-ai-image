@@ -6,7 +6,7 @@ def download_images():
     os.makedirs(raw_dir, exist_ok=True)
 
     for i in range(12):
-        url = f"https://picsum.photos/seed/{i+100}/800/800"
+        url = f"https://picsum.photos/seed/unique_seed_{i+50}/800/800"
         print(f"Downloading {url} ...")
         response = requests.get(url)
         if response.status_code == 200:

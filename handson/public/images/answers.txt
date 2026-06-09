@@ -1,0 +1,12 @@
+image_01: ai (watermark)
+image_02: ai (watermark)
+image_03: ai (watermark)
+image_04: ai (exif)
+image_05: ai (exif)
+image_06: ai (exif)
+image_07: real
+image_08: real
+image_09: real
+image_10: real
+image_11: real
+image_12: real
