@@ -1,68 +1,117 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Image Quiz</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="/src/style.css" />
-  </head>
-  <body>
-    <!-- Terminal panel -->
-    <div id="terminal-panel">
-      <button id="terminal-toggle">
-        <span id="toggle-icon">&lt;</span>
-      </button>
-      <div class="terminal-header">Terminal</div>
-      <div id="terminal-history" class="terminal-history"></div>
-      <div class="terminal-body">
-        <span class="prompt-symbol">$</span>
-        <input type="text" id="terminal-input" autocomplete="off" spellcheck="false" />
-      </div>
-    </div>
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+        />
+        <title>AI Image Quiz</title>
+        <link
+            rel="preconnect"
+            href="https://fonts.googleapis.com"
+        />
+        <link
+            rel="preconnect"
+            href="https://fonts.gstatic.com"
+            crossorigin
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            rel="stylesheet"
+            href="/src/style.css"
+        />
+    </head>
+    <body>
+        <!-- Terminal panel -->
+        <div id="terminal-panel">
+            <button id="terminal-toggle">
+                <span id="toggle-icon">&lt;</span>
+            </button>
+            <div class="terminal-header">Terminal</div>
+            <div
+                id="terminal-history"
+                class="terminal-history"
+            ></div>
+            <div class="terminal-body">
+                <span class="prompt-symbol">$</span>
+                <input
+                    type="text"
+                    id="terminal-input"
+                    autocomplete="off"
+                    spellcheck="false"
+                />
+            </div>
+        </div>
 
-    <!-- Phase 3: Explain Phase -->
-    <div id="phase-explain" class="phase-container hidden">
-      <div class="header-section">
-        <h1>仕組みの解説</h1>
-        <p class="description">AI画像を見分けるための裏側の仕組み</p>
-      </div>
-      <div class="explain-content" style="padding: 2rem;">
-        <h2>1. ウォーターマーク（拡散スペクトル方式）</h2>
-        <p>画像全体に極小の固定ノイズパターンを加算しています。人間の目には見えませんが、ピクセル配列を解析して相関値として検出可能です。</p>
-        <h2>2. メタデータ（Exif MakerNote）</h2>
-        <p>画像ファイルのヘッダー領域に特定の文字列データを埋め込んでいます。解析ツールを用いることで読み取ることができます。</p>
-      </div>
-    </div>
+        <!-- Phase 3: Explain Phase -->
+        <div
+            id="phase-explain"
+            class="phase-container hidden"
+        >
+            <div class="header-section">
+                <h1>仕組みの解説</h1>
+                <p class="description">AI画像を見分けるための裏側の仕組み</p>
+            </div>
+            <div
+                class="explain-content"
+                style="padding: 2rem"
+            >
+                <h2>1. ウォーターマーク（拡散スペクトル方式）</h2>
+                <p>
+                    画像全体に極小の固定ノイズパターンを加算しています。人間の目には見えませんが、ピクセル配列を解析して相関値として検出可能です。
+                </p>
+                <h2>2. メタデータ（Exif MakerNote）</h2>
+                <p>
+                    画像ファイルのヘッダー領域に特定の文字列データを埋め込んでいます。解析ツールを用いることで読み取ることができます。
+                </p>
+            </div>
+        </div>
 
-    <!-- Phase 1: Quiz Phase -->
-    <div id="phase-quiz" class="phase-container">
-      <div class="header-section">
-        <h1>AI Image Quiz</h1>
-        <p class="description">この中に <span id="ai-count"></span>枚 のAI生成画像が含まれています</p>
-      </div>
-      <div id="quiz-grid" class="image-grid">
-        <!-- Images will be inserted here by main.ts -->
-      </div>
-    </div>
+        <!-- Phase 1: Quiz Phase -->
+        <div
+            id="phase-quiz"
+            class="phase-container"
+        >
+            <div class="header-section">
+                <h1>AI Image Quiz</h1>
+                <p class="description">
+                    この中に <span id="ai-count"></span>枚
+                    のAI生成画像が含まれています
+                </p>
+            </div>
+            <div
+                id="quiz-grid"
+                class="image-grid"
+            >
+                <!-- Images will be inserted here by main.ts -->
+            </div>
+        </div>
 
-    <!-- Phase 2: Answer Phase -->
-    <div id="phase-answer" class="phase-container hidden">
-      <div class="header-section">
-        <h1>Validation Dashboard</h1>
-        <p class="description">検証ツールを用いて画像を分析します</p>
-        <h2 id="score-display"></h2>
-      </div>
-      <div id="answer-list" class="answer-list">
-        <!-- Validation rows will be inserted here by main.ts -->
-      </div>
-    </div>
+        <!-- Phase 2: Answer Phase -->
+        <div
+            id="phase-answer"
+            class="phase-container hidden"
+        >
+            <div class="header-section">
+                <h1>Validation Dashboard</h1>
+                <p class="description">検証ツールを用いて画像を分析します</p>
+                <h2 id="score-display"></h2>
+            </div>
+            <div
+                id="answer-list"
+                class="answer-list"
+            >
+                <!-- Validation rows will be inserted here by main.ts -->
+            </div>
+        </div>
 
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+        <script
+            type="module"
+            src="/src/main.ts"
+        ></script>
+    </body>
 </html>
