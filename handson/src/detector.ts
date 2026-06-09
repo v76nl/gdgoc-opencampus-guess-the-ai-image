@@ -1,7 +1,7 @@
 import exifr from 'exifr';
 import * as tf from '@tensorflow/tfjs';
 
-export async function parseExif(imageEl: HTMLImageElement): Promise<string | null> {
+export async function parseExif(imageEl: HTMLImageElement): Promise<{ result: string, detected: boolean }> {
   try {
     let exifData: any = null;
     try {
@@ -25,11 +25,11 @@ export async function parseExif(imageEl: HTMLImageElement): Promise<string | nul
     }
 
     if (isAiExif) {
-      return "MakerNote: AI_GENERATED_IMAGE_DETECTED";
+      return { result: "AIらしきメタデータを検知", detected: true };
     }
-    return "No AI specific Exif tag found.";
+    return { result: "AIらしきメタデータは見つかりませんでした", detected: false };
   } catch (error) {
-    return "Error parsing Exif.";
+    return { result: "メタデータの解析に失敗しました", detected: false };
   }
 }
 

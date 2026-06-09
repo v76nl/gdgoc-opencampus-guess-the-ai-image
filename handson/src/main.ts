@@ -102,7 +102,14 @@ function initPhase2() {
     const row = document.createElement('div');
     row.className = 'answer-row';
     const translatedUserLabel = userLabel === 'AI' ? 'AI' : userLabel === 'Real' ? '本物' : 'なし';
-    const actualLabel = isAiActual ? '(Actual: AI)' : '(Actual: 本物)';
+    
+    let actualLabel = '';
+    if (isAiActual) {
+      actualLabel = index < 3 ? '(Actual: AI (Watermark))' : '(Actual: AI (Meta))';
+    } else {
+      actualLabel = '(Actual: 本物)';
+    }
+
     row.innerHTML = `
       <div class="answer-image">
         <img id="img-${index}" src="${src}" alt="Image ${index + 1}" crossorigin="anonymous" />
@@ -128,9 +135,9 @@ function initPhase2() {
     btnExif.addEventListener('click', async () => {
       exifResult.textContent = '解析中...';
       const imgEl = row.querySelector(`#img-${index}`) as HTMLImageElement;
-      const result = await parseExif(imgEl);
-      exifResult.textContent = result || '';
-      if (result?.includes('AI_GENERATED')) {
+      const parsed = await parseExif(imgEl);
+      exifResult.textContent = parsed.result;
+      if (parsed.detected) {
         exifResult.classList.add('highlight');
       } else {
         exifResult.classList.remove('highlight');
@@ -144,7 +151,7 @@ function initPhase2() {
       pixelResult.textContent = '解析中...';
       const imgEl = row.querySelector(`#img-${index}`) as HTMLImageElement;
       const result = await analyzePixel(imgEl);
-      pixelResult.textContent = `Score: ${result.score.toFixed(4)} - ${result.detected ? 'ウォーターマークを検知' : 'ノイズパターン不一致'}`;
+      pixelResult.textContent = `Score: ${result.score.toFixed(4)} - ${result.detected ? 'AIらしきウォーターマークを検知' : 'AIらしきウォーターマークは見つかりませんでした'}`;
       if (result.detected) {
         pixelResult.classList.add('highlight');
       } else {
@@ -204,6 +211,8 @@ terminalInput.addEventListener('keydown', (e) => {
       isDevMode = false;
       if (phase === 2) initPhase2();
       response = 'Switched to User mode.';
+    } else if (val === 'help') {
+      response = `Available commands:<br>- answer: 答え合わせ<br>- back (reset): クイズに戻る<br>- explain: 仕組み解説<br>- debug (dev/admin): 開発モード<br>- user: ユーザーモード<br>- help: ヘルプ表示`;
     } else {
       response = `Command not found: ${val}`;
     }
