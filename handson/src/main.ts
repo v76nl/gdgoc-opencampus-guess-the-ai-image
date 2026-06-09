@@ -1,19 +1,20 @@
 import './style.css';
 import { parseExif, analyzePixel } from './detector';
 
+const BASE = import.meta.env.BASE_URL;
 const IMAGES = [
-  '/images/image_01.png',
-  '/images/image_02.png',
-  '/images/image_03.png',
-  '/images/image_04.jpg',
-  '/images/image_05.jpg',
-  '/images/image_06.jpg',
-  '/images/image_07.jpg',
-  '/images/image_08.jpg',
-  '/images/image_09.jpg',
-  '/images/image_10.jpg',
-  '/images/image_11.jpg',
-  '/images/image_12.jpg',
+  `${BASE}images/image_01.png`,
+  `${BASE}images/image_02.png`,
+  `${BASE}images/image_03.png`,
+  `${BASE}images/image_04.jpg`,
+  `${BASE}images/image_05.jpg`,
+  `${BASE}images/image_06.jpg`,
+  `${BASE}images/image_07.jpg`,
+  `${BASE}images/image_08.jpg`,
+  `${BASE}images/image_09.jpg`,
+  `${BASE}images/image_10.jpg`,
+  `${BASE}images/image_11.jpg`,
+  `${BASE}images/image_12.jpg`,
 ];
 
 // State
