@@ -226,7 +226,7 @@ terminalInput.addEventListener('keydown', (e) => {
       if (phase === 2) initPhase2();
       response = 'Switched to User mode.';
     } else if (val === 'help') {
-      response = `Available commands:<br>- answer: 答え合わせ<br>- back (reset): クイズに戻る<br>- explain: 仕組み解説<br>- debug (dev/admin): 開発モード<br>- user: ユーザーモード<br>- help: ヘルプ表示`;
+      response = `Available commands:<br>- answer: 答え合わせ<br>- back/reset: クイズに戻る<br>- explain: 仕組み解説ページ<br>- debug/dev/admin: 開発者モード<br>- user: 一般ユーザーモード<br>- help: ヘルプ表示`;
     } else {
       response = `Command not found: ${val}`;
     }
