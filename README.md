@@ -1,50 +1,103 @@
 # gdgoc-opencampus-guess-the-ai-image
 
-本プロジェクトは、AIによって生成された画像を見破るクイズアプリケーション、およびそのデータセットを構築するためのPythonスクリプトから成るプロジェクトです。
+本プロジェクトは、AIによって生成された画像（ウォーターマークやExifなどの識別情報が埋め込まれた画像）と本物の画像を見分けるクイズアプリケーション、およびそのデータセットを生成するためのPythonスクリプトから成る体験型学習プロジェクトです。
+
+デモページ: https://v76nl.github.io/gdgoc-opencampus-guess-the-ai-image/
+
+---
 
 ## ディレクトリ・ファイル構成
 
-project-root/
-- prepare/
-  データセットを作成するためのPython環境です。
-  - .venv/
-    Pythonの仮想環境です。
-  - raw_images/
-    ウェブから取得した未加工の元画像が格納されます。
-  - output_images/
-    加工済み（ウォーターマークやメタデータが付与されたもの）の画像が出力されます。
-    - answers.txt
-      どの画像がAI生成のものであるかを示す正答リストです。
-  - scripts/
-    画像生成処理を実行するPythonスクリプト群です。
-    - download.py
-      画像を一括でダウンロードするスクリプトです。
-    - watermark.py
-      拡散スペクトル方式のノイズ（不可視ウォーターマーク）を加算するスクリプトです。
-    - exif.py
-      ExifのMakerNoteタグに特定の文字列データを埋め込むスクリプトです。
+プロジェクトのディレクトリ構造は以下の通りです。データ生成を行う `prepare/` 環境と、ユーザーがクイズを体験する `handson/` 環境に分かれています。
 
-- handson/
-  体験用のフロントエンドアプリケーション（Vite + TypeScript）です。
-  - public/
-    画像アセットなどが配置されます。
-    - images/
-      クイズで出題される画像群です（prepare/output_images/ からコピーされたものです）。
-  - src/
-    アプリケーションのソースコードです。
-    - main.ts
-      状態管理やUIの構築を行うメインロジックです。
-    - detector.ts
-      画像のメタデータ解析（exifr）やピクセル解析（TensorFlow.jsによる相関計算のモック）を担当するモジュールです。
-    - style.css
-      アプリケーションのスタイルシートです。
-  - index.html
-    フロントエンドのエントリーポイントとなるHTMLです。
+```text
+.
+├── .github/
+│   └── workflows/
+│       └── deploy.yml          # GitHub Pagesへの自動デプロイ用ワークフロー
+├── prepare/
+│   ├── raw_images/             # ウェブから取得した未加工の元画像が一時保存されるディレクトリ
+│   ├── output_images/          # 加工（ウォーターマーク/Exif埋め込み）完了後の画像出力先
+│   │   └── answers.txt         # どの画像がAI生成であるかを示す正答テキストリスト
+│   ├── scripts/                # 各種データ生成を行うPythonスクリプト
+│   │   ├── download.py         # 画像の自動一括ダウンロード
+│   │   ├── exif.py             # ExifのMakerNoteへの識別用テキスト書き込み
+│   │   ├── watermark.py        # 拡散スペクトル方式の不可視ウォーターマーク重畳
+│   │   └── generate_answers.py # 正答テキストリストの自動生成
+│   ├── pyproject.toml          # uvによる依存関係定義
+│   └── uv.lock                 # 依存パッケージのロックファイル
+├── handson/
+│   ├── public/
+│   │   └── images/             # クイズに出題される画像アセット群（prepareの出力をコピー）
+│   ├── src/
+│   │   ├── main.ts             # アプリのメインロジック（UI制御・ターミナル動作・フェーズ遷移）
+│   │   ├── detector.ts         # メタデータ・ピクセルのAI判定ロジックモジュール
+│   │   └── style.css           # スタイルシート（ITIL調の配色・コンソール風ターミナルUI）
+│   ├── index.html              # フロントエンドのHTMLエントリーポイント
+│   ├── package.json            # Node.js依存パッケージ定義
+│   ├── tsconfig.json           # TypeScript用設定
+│   └── vite.config.ts          # Vite用の設定（GitHub Pages用のベースパス等）
+└── README.md                   # 本ドキュメント
+```
 
-## 開発環境の立ち上げ
+---
 
-1. データセットの準備
-prepareディレクトリで `uv` を用いて依存関係を解決し、各種スクリプトを実行してください。生成された画像はhandson/public/images/に配置します。
+## 流れ
 
-2. フロントエンドの起動
-handsonディレクトリ内で `pnpm install` を実行し、`pnpm dev` でローカルサーバーを起動します。
+本プロジェクトにおけるデータ生成からクイズの判定までの処理の流れは、以下の通りとなっています。
+
+### 1. データセットの準備 (prepare)
+1. **画像のダウンロード**: `download.py` を用いて、picsum.photosから一意なシードを用いて12枚の画像を取得します。
+2. **ウォーターマークの埋め込み (AI画像タイプ1)**: `watermark.py` を実行し、12枚のうち最初の3枚（01〜03）のピクセルデータに対して、人間の目には知覚できない拡散スペクトル方式の極小ノイズ（ウォーターマーク）を重畳します。
+3. **Exifメタデータの埋め込み (AI画像タイプ2)**: `exif.py` を実行し、続く3枚（04〜06）の画像のExifヘッダー領域（MakerNoteタグ）に、AI生成であることを示す特定の暗号化テキストを埋め込みます。
+4. **正解リストの生成**: `generate_answers.py` を実行し、どの画像にどの種類の加工が施されているか（Watermark/Exif/Real）をまとめた `answers.txt` を生成します。
+5. **本物の画像**: 残りの6枚（07〜12）は未加工のまま本物の画像（Real）として扱います。
+
+### 2. フロントエンドへの統合 (handson)
+1. 生成された12枚の画像データを `handson/public/images/` に配置します。
+2. フロントエンドでは画像を取得し、クイズ形式で12枚並べて表示します。
+
+### 3. クイズ体験と解析のシミュレーション
+1. **クイズフェーズ (Phase 1)**: ユーザーは並んだ画像を見ながら、「AI生成」か「本物」かを自身の目で見極め、ボタンをクリックして推測を記録します。
+2. **検証フェーズ (Phase 2)**: 画面の隠しターミナルに `answer` とコマンドを入力すると、答え合わせダッシュボードへ遷移します。
+3. **検証ツールの実行**: 各カードの「メタデータ解析」や「ピクセル解析」ボタンを押すと、`detector.ts` に実装された検出ロジックが実行されます。
+   - メタデータ解析は `exifr` ライブラリを使用して画像のMakerNoteヘッダーを解析し、特定の識別コードが存在するか検証します。
+   - ピクセル解析は、埋め込まれているはずのノイズパターンとの相関係数を計算し、閾値を超えた場合にウォーターマークを検知します。
+4. **開発者モード**: ターミナルで `debug`, `dev`, `admin` と入力すると開発者モードに切り替わり、正解ラベルおよび具体的なAI加工タイプ（MetaかWatermarkか）がダッシュボード上で可視化されます。通常のユーザーモード（`user`入力時）では正解は伏せられ、解析ツールを使って自力で推測する構成になります。
+
+---
+
+## 開発環境の立ち上げ手順
+
+### 1. データ生成（Python環境）
+`prepare` ディレクトリで `uv` を使用してPythonパッケージ環境を立ち上げ、スクリプト群を実行します。
+
+```bash
+cd prepare
+# 依存関係のインストール
+uv sync
+
+# 各種スクリプトの実行によるデータ生成
+uv run python scripts/download.py
+uv run python scripts/watermark.py
+uv run python scripts/exif.py
+uv run python scripts/generate_answers.py
+
+# 生成された画像データをフロントエンドの公開ディレクトリへ配置
+# (Windows環境の例)
+Copy-Item -Path "output_images\*" -Destination "..\handson\public\images\" -Recurse -Force
+```
+
+### 2. アプリの起動（フロントエンド環境）
+`handson` ディレクトリへ移動し、Viteの開発サーバーを立ち上げます。
+
+```bash
+cd ../handson
+
+# 依存パッケージのインストール
+pnpm install
+
+# ローカル開発サーバーの起動
+pnpm dev
+```
+起動後、ブラウザで `http://localhost:5173/` にアクセスしてアプリケーションを体験できます。
