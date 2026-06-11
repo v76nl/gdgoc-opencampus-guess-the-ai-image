@@ -14,8 +14,9 @@ export async function parseExif(imageEl: HTMLImageElement): Promise<{ result: st
     }
     
     let isAiExif = false;
-    if (exifData && exifData.MakerNote) {
-      const note = String(exifData.MakerNote);
+    const noteRaw = exifData ? (exifData.makerNote || exifData.MakerNote) : null;
+    if (noteRaw) {
+      const note = String(noteRaw);
       if (note.includes('AI_GENERATED_IMAGE_DETECTED') || note.includes('65,73,95,71,69,78')) {
         isAiExif = true;
       }
@@ -24,7 +25,8 @@ export async function parseExif(imageEl: HTMLImageElement): Promise<{ result: st
     const debugInfo = {
       hasExifData: !!exifData,
       keys: exifData ? Object.keys(exifData) : [],
-      makerNoteType: exifData?.MakerNote ? typeof exifData.MakerNote : 'undefined',
+      makerNoteType: noteRaw ? typeof noteRaw : 'undefined',
+      makerNoteString: noteRaw ? String(noteRaw).substring(0, 100) : '',
       parseError
     };
 
