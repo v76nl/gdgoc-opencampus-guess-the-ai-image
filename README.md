@@ -102,11 +102,8 @@ cd prepare
 # 依存関係のインストール
 uv sync
 
-# 各種スクリプトの実行によるデータ生成
-uv run python scripts/download.py
-uv run python scripts/watermark.py
-uv run python scripts/exif.py
-uv run python scripts/generate_answers.py
+# パイプラインを実行してデータを自動生成
+uv run python main.py
 ```
 
 ### 2. アプリの起動（フロントエンド環境）
