@@ -12,16 +12,25 @@ def main():
 
     print("Starting data preparation pipeline...")
     
-    # 0. Check and download raw images if missing
-    if not os.path.exists(raw_dir) or len(os.listdir(raw_dir)) == 0:
-        print("Raw images directory is empty or missing. Fetching sample images...")
+    # Clean up output_images directory to prevent leftover files
+    if os.path.exists(out_dir):
+        for file_name in os.listdir(out_dir):
+            file_path = os.path.join(out_dir, file_name)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+    else:
+        os.makedirs(out_dir, exist_ok=True)
+    
+    # 0. Check and download raw images if missing or count is not 6
+    if not os.path.exists(raw_dir) or len(os.listdir(raw_dir)) != 6:
+        print("Raw images directory is empty or count is not 6. Fetching 6 sample images...")
         from scripts.download import download_images
         download_images()
     
-    print("1/3 Applying watermarks to images 1-3...")
+    print("1/3 Applying watermarks...")
     apply_watermark()
     
-    print("2/3 Applying Exif metadata to images 4-6...")
+    print("2/3 Applying Exif metadata...")
     apply_exif()
     
     print("3/3 Generating answers.txt...")
@@ -30,6 +39,13 @@ def main():
     # Automatically copy output files to frontend public/images directory
     if os.path.exists(handson_images_dir):
         print(f"Automatically copying prepared images to frontend: {handson_images_dir}")
+        # Clean up existing images/answers.txt in frontend to avoid leftovers
+        for file_name in os.listdir(handson_images_dir):
+            if file_name.startswith("image_") or file_name == "answers.txt":
+                try:
+                    os.remove(os.path.join(handson_images_dir, file_name))
+                except Exception:
+                    pass
         for file_name in os.listdir(out_dir):
             src_file = os.path.join(out_dir, file_name)
             dst_file = os.path.join(handson_images_dir, file_name)
