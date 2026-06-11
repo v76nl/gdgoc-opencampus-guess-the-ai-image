@@ -87,6 +87,7 @@ function initPhase1() {
 
     const card = document.createElement('div');
     card.className = 'quiz-card';
+    card.style.animationDelay = `${index * 0.15}s`;
     card.innerHTML = `
       <img src="${src}" alt="Image ${index + 1}" />
       <div class="label-container">
