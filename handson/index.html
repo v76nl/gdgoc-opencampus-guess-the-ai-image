@@ -6,7 +6,7 @@
             name="viewport"
             content="width=device-width, initial-scale=1.0"
         />
-        <title>AI Image Quiz</title>
+        <title>iTL Open Campus AI Image Quiz</title>
         <link
             rel="preconnect"
             href="https://fonts.googleapis.com"
@@ -29,7 +29,17 @@
         <!-- Terminal panel -->
         <div id="terminal-panel">
             <button id="terminal-toggle">
-                <svg id="toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter">
+                <svg
+                    id="toggle-icon"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="3"
+                    stroke-linecap="square"
+                    stroke-linejoin="miter"
+                >
                     <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
             </button>
@@ -79,10 +89,13 @@
             class="phase-container"
         >
             <div class="header-section">
-                <h1>AI Image Quiz</h1>
+                <h1>iTL Open Campus AI Image Quiz</h1>
                 <p class="description">
                     この中に <span id="ai-count"></span>枚
-                    のAI生成画像が含まれています
+                    のAI生成画像が含まれています。
+                </p>
+                <p class="description">
+                    答え合わせは指示があるまでお待ちください。
                 </p>
             </div>
             <div
@@ -112,9 +125,16 @@
         </div>
 
         <!-- Image Modal Overlay -->
-        <div id="image-modal" class="image-modal">
+        <div
+            id="image-modal"
+            class="image-modal"
+        >
             <div class="modal-content">
-                <img id="modal-image" src="" alt="Enlarged view" />
+                <img
+                    id="modal-image"
+                    src=""
+                    alt="Enlarged view"
+                />
             </div>
         </div>
 

@@ -246,7 +246,7 @@ function initPhase2() {
     answerList.appendChild(row);
   });
 
-  scoreDisplay.textContent = `正答数: ${correctCount} / ${IMAGES.length}`;
+  scoreDisplay.innerHTML = `あなたは <span class="highlight">${IMAGES.length}枚中${correctCount}枚</span> 正解できました！`;
 }
 
 // Terminal Logic
