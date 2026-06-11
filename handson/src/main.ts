@@ -230,7 +230,19 @@ terminalInput.addEventListener('keydown', (e) => {
     } else if (val === 'debug' || val === 'dev' || val === 'admin') {
       isDevMode = true;
       if (phase === 2) initPhase2();
-      response = 'Switched to Developer mode.';
+      response = 'Switched to Developer mode.<br>' +
+        'image_01: ai (watermark)<br>' +
+        'image_02: ai (watermark)<br>' +
+        'image_03: ai (watermark)<br>' +
+        'image_04: ai (exif)<br>' +
+        'image_05: ai (exif)<br>' +
+        'image_06: ai (exif)<br>' +
+        'image_07: real<br>' +
+        'image_08: real<br>' +
+        'image_09: real<br>' +
+        'image_10: real<br>' +
+        'image_11: real<br>' +
+        'image_12: real';
     } else if (val === 'user') {
       isDevMode = false;
       if (phase === 2) initPhase2();
