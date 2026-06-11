@@ -28,13 +28,26 @@ def main():
         download_images()
     
     print("1/3 Applying watermarks...")
-    apply_watermark()
+    # Calculate counts and create shuffled assignments
+    import math
+    import random
+    images = sorted([f for f in os.listdir(raw_dir) if f.lower().endswith(('.png', '.jpg', '.jpeg'))])
+    N = len(images)
+    watermark_count = math.ceil(N / 4)
+    exif_count = math.ceil(N / 4)
+    real_count = N - watermark_count - exif_count
+    
+    assignments = ['watermark'] * watermark_count + ['exif'] * exif_count + ['real'] * real_count
+    random.shuffle(assignments)
+    print(f"Shuffled Assignments for {N} images: {assignments}")
+    
+    apply_watermark(assignments)
     
     print("2/3 Applying Exif metadata...")
-    apply_exif()
+    apply_exif(assignments)
     
     print("3/3 Generating answers.txt...")
-    generate_answers()
+    generate_answers(assignments)
     
     # Automatically copy output files to frontend public/images directory
     if os.path.exists(handson_images_dir):

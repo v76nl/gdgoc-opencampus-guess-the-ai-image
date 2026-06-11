@@ -2,7 +2,7 @@ import os
 import piexif
 import cv2
 
-def apply_exif():
+def apply_exif(assignments=None):
     base_dir = os.path.dirname(os.path.dirname(__file__))
     raw_dir = os.path.join(base_dir, "raw_images")
     out_dir = os.path.join(base_dir, "output_images")
@@ -14,8 +14,12 @@ def apply_exif():
     watermark_count = math.ceil(N / 4)
     exif_count = math.ceil(N / 4)
     
+    if assignments is None:
+        assignments = ['watermark'] * watermark_count + ['exif'] * exif_count + ['real'] * (N - watermark_count - exif_count)
+    
     for i, img_name in enumerate(images):
-        if watermark_count <= i < watermark_count + exif_count:
+        role = assignments[i]
+        if role == 'exif':
             src_path = os.path.join(raw_dir, img_name)
             out_path = os.path.join(out_dir, img_name)
             

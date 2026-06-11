@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 import shutil
 
-def apply_watermark():
+def apply_watermark(assignments=None):
     base_dir = os.path.dirname(os.path.dirname(__file__))
     raw_dir = os.path.join(base_dir, "raw_images")
     out_dir = os.path.join(base_dir, "output_images")
@@ -14,6 +14,9 @@ def apply_watermark():
     N = len(images)
     watermark_count = math.ceil(N / 4)
     exif_count = math.ceil(N / 4)
+    
+    if assignments is None:
+        assignments = ['watermark'] * watermark_count + ['exif'] * exif_count + ['real'] * (N - watermark_count - exif_count)
     
     # create a fixed deterministic noise pattern for 800x800 using LCG
     length = 800 * 800 * 3
@@ -27,8 +30,9 @@ def apply_watermark():
     for i, img_name in enumerate(images):
         src_path = os.path.join(raw_dir, img_name)
         out_path = os.path.join(out_dir, img_name)
+        role = assignments[i]
         
-        if i < watermark_count:
+        if role == 'watermark':
             # Apply watermark
             img = cv2.imread(src_path)
             if img is not None:
@@ -36,8 +40,8 @@ def apply_watermark():
                 watermarked = np.clip(img_resized + noise, 0, 255).astype(np.uint8)
                 out_path_png = os.path.splitext(out_path)[0] + ".png"
                 cv2.imwrite(out_path_png, watermarked)
-        elif i >= watermark_count + exif_count:
-            # Copy unmodified (images watermark_count + exif_count to N-1)
+        elif role == 'real':
+            # Copy unmodified
             img = cv2.imread(src_path)
             if img is not None:
                 cv2.imwrite(out_path, img)
