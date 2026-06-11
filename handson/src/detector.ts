@@ -62,13 +62,13 @@ export async function analyzePixel(imageEl: HTMLImageElement): Promise<{ score: 
           const correlation = imgTensor.mul(noise).mean();
           const score = correlation.dataSync()[0];
           
-          return { score, detected: false };
+          return { score, detected: false, shape: `${height}x${width}x${channels}` };
         });
         
         // Expected score for watermarked is ~7.7. Unwatermarked is ~0.0.
         // Threshold set to 2.0 to be safe.
         const detected = result.score > 2.0;
-        resolve({ score: result.score, detected, debugLog: `Raw Score: ${result.score}` });
+        resolve({ score: result.score, detected, debugLog: `Raw Score: ${result.score} (Shape: ${result.shape})` });
       } catch (e) {
         console.error(e);
         resolve({ score: 0, detected: false, debugLog: String(e) });
