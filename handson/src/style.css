@@ -161,24 +161,29 @@ h1, h2, h3, p {
   background-color: #333;
   color: var(--itl-white);
   padding: 1rem;
-  font-family: 'Consolas', 'Courier New', monospace;
+  font-family: 'Consolas', 'Courier New', monospace !important;
 }
-
+ 
 .terminal-history {
   flex: 1;
   padding: 1rem;
   overflow-y: auto;
   color: var(--itl-white);
-  font-family: 'Consolas', 'Courier New', monospace;
+  font-family: 'Consolas', 'Courier New', monospace !important;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
-
+ 
+.terminal-history * {
+  font-family: 'Consolas', 'Courier New', monospace !important;
+}
+ 
 .history-line {
   word-break: break-all;
+  font-family: 'Consolas', 'Courier New', monospace !important;
 }
-
+ 
 .terminal-body {
   padding: 1rem;
   display: flex;
@@ -186,7 +191,7 @@ h1, h2, h3, p {
   align-items: center;
   gap: 0.5rem;
   color: var(--itl-white);
-  font-family: 'Consolas', 'Courier New', monospace;
+  font-family: 'Consolas', 'Courier New', monospace !important;
   border-top: 1px solid #333;
 }
 
