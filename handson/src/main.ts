@@ -143,6 +143,14 @@ function initPhase2() {
       } else {
         exifResult.classList.remove('highlight');
       }
+      
+      if (isDevMode) {
+        const line = document.createElement('div');
+        line.className = 'terminal-line response';
+        line.innerHTML = `[DEV] Image ${index + 1} Exif: ${parsed.debugLog}`;
+        terminalHistory.appendChild(line);
+        terminalHistory.scrollTop = terminalHistory.scrollHeight;
+      }
     });
 
     const btnPixel = row.querySelector('.btn-pixel') as HTMLButtonElement;
@@ -157,6 +165,14 @@ function initPhase2() {
         pixelResult.classList.add('highlight');
       } else {
         pixelResult.classList.remove('highlight');
+      }
+      
+      if (isDevMode) {
+        const line = document.createElement('div');
+        line.className = 'terminal-line response';
+        line.innerHTML = `[DEV] Image ${index + 1} Pixel: ${result.debugLog}`;
+        terminalHistory.appendChild(line);
+        terminalHistory.scrollTop = terminalHistory.scrollHeight;
       }
     });
 

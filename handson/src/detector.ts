@@ -1,7 +1,7 @@
 import exifr from 'exifr';
 import * as tf from '@tensorflow/tfjs';
 
-export async function parseExif(imageEl: HTMLImageElement): Promise<{ result: string, detected: boolean }> {
+export async function parseExif(imageEl: HTMLImageElement): Promise<{ result: string, detected: boolean, debugLog: string }> {
   try {
     let exifData: any = null;
     try {
@@ -19,15 +19,15 @@ export async function parseExif(imageEl: HTMLImageElement): Promise<{ result: st
     }
 
     if (isAiExif) {
-      return { result: "AIらしきメタデータを検知", detected: true };
+      return { result: "AIらしきメタデータを検知", detected: true, debugLog: JSON.stringify(exifData?.MakerNote || {}) };
     }
-    return { result: "AIらしきメタデータは見つかりませんでした", detected: false };
+    return { result: "AIらしきメタデータは見つかりませんでした", detected: false, debugLog: JSON.stringify(exifData?.MakerNote || {}) };
   } catch (error) {
-    return { result: "メタデータの解析に失敗しました", detected: false };
+    return { result: "メタデータの解析に失敗しました", detected: false, debugLog: String(error) };
   }
 }
 
-export async function analyzePixel(imageEl: HTMLImageElement): Promise<{ score: number, detected: boolean }> {
+export async function analyzePixel(imageEl: HTMLImageElement): Promise<{ score: number, detected: boolean, debugLog: string }> {
   await tf.ready();
   
   return new Promise((resolve) => {
@@ -54,7 +54,9 @@ export async function analyzePixel(imageEl: HTMLImageElement): Promise<{ score: 
             const ustate = state >>> 0;
             noiseArray[i] = (ustate / 4294967296.0) * 10.0 - 5.0;
           }
-          const noise = tf.tensor3d(noiseArray, [height, width, channels]);
+          // OpenCV reads in BGR, but tf.browser.fromPixels reads in RGB.
+          // We need to reverse the channel dimension to match the noise generation.
+          const noise = tf.tensor3d(noiseArray, [height, width, channels]).reverse(2);
           
           // Compute correlation (mean of image * noise)
           const correlation = imgTensor.mul(noise).mean();
@@ -63,13 +65,13 @@ export async function analyzePixel(imageEl: HTMLImageElement): Promise<{ score: 
           return { score, detected: false };
         });
         
-        // Expected score for watermarked is ~8.3. Unwatermarked is ~0.0.
+        // Expected score for watermarked is ~7.7. Unwatermarked is ~0.0.
         // Threshold set to 2.0 to be safe.
         const detected = result.score > 2.0;
-        resolve({ score: result.score, detected });
+        resolve({ score: result.score, detected, debugLog: `Raw Score: ${result.score}` });
       } catch (e) {
         console.error(e);
-        resolve({ score: 0, detected: false });
+        resolve({ score: 0, detected: false, debugLog: String(e) });
       }
     }, 100); // UI wait
   });
