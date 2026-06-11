@@ -182,13 +182,10 @@ function initPhase2() {
   scoreDisplay.textContent = `正答数: ${correctCount} / ${IMAGES.length}`;
 }
 
-const toggleIcon = document.getElementById('toggle-icon') as HTMLSpanElement;
-
 // Terminal Logic
 terminalToggle.addEventListener('click', () => {
   terminalPanel.classList.toggle('open');
   const isOpen = terminalPanel.classList.contains('open');
-  toggleIcon.textContent = isOpen ? '>' : '<';
   if (isOpen) {
     terminalInput.focus();
   }
@@ -211,7 +208,6 @@ terminalInput.addEventListener('keydown', (e) => {
       response = 'Loading Validation Dashboard...';
       setTimeout(() => {
         terminalPanel.classList.remove('open');
-        toggleIcon.textContent = '<';
       }, 600);
     } else if (val === 'reset' || val === 'back') {
       phase = 1;
@@ -222,7 +218,6 @@ terminalInput.addEventListener('keydown', (e) => {
       response = 'Returning to Phase 1...';
       setTimeout(() => {
         terminalPanel.classList.remove('open');
-        toggleIcon.textContent = '<';
       }, 600);
     } else if (val === 'explain') {
       phaseQuiz.classList.add('hidden');
@@ -231,7 +226,6 @@ terminalInput.addEventListener('keydown', (e) => {
       response = 'Displaying explanation...';
       setTimeout(() => {
         terminalPanel.classList.remove('open');
-        toggleIcon.textContent = '<';
       }, 600);
     } else if (val === 'debug' || val === 'dev' || val === 'admin') {
       isDevMode = true;

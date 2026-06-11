@@ -124,6 +124,17 @@ h1, h2, h3, p {
   color: var(--itl-white) !important;
 }
 
+#toggle-icon {
+  width: 1em;
+  height: 1em;
+  transition: transform 0.3s ease-in-out;
+  display: block;
+}
+
+#terminal-panel.open #toggle-icon {
+  transform: rotate(180deg);
+}
+
 .btn {
   padding: 0.5rem 1rem;
   border: 2px solid var(--itl-black);
