@@ -48,11 +48,24 @@ h1, h2, h3, p {
   padding: 2rem;
 }
 
+@keyframes flipIn {
+  from {
+    transform: perspective(1000px) rotateY(180deg);
+    opacity: 0;
+  }
+  to {
+    transform: perspective(1000px) rotateY(0deg);
+    opacity: 1;
+  }
+}
+
 .quiz-card {
   position: relative;
   border: 2px solid var(--itl-black);
   cursor: pointer;
   background-color: #fff;
+  opacity: 0;
+  animation: flipIn 0.6s ease-out forwards;
 }
 
 .quiz-card img {
