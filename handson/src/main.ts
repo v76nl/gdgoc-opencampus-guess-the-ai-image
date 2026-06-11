@@ -24,6 +24,24 @@ const phaseExplain = document.getElementById('phase-explain') as HTMLDivElement;
 const scoreDisplay = document.getElementById('score-display') as HTMLHeadingElement;
 const aiCountSpan = document.getElementById('ai-count') as HTMLSpanElement;
 
+const imageModal = document.getElementById('image-modal') as HTMLDivElement;
+const modalImage = document.getElementById('modal-image') as HTMLImageElement;
+
+if (imageModal) {
+  imageModal.addEventListener('click', (e) => {
+    if (e.target === imageModal) {
+      imageModal.classList.remove('open');
+    }
+  });
+}
+
+function openModal(src: string) {
+  if (modalImage && imageModal) {
+    modalImage.src = src;
+    imageModal.classList.add('open');
+  }
+}
+
 async function loadImagesConfig() {
   try {
     const res = await fetch(`${BASE}images/answers.txt?v=${Date.now()}`);
@@ -113,6 +131,14 @@ function initPhase1() {
       labels[src] = labels[src] === 'Real' ? null : 'Real';
       updateBtns();
     });
+
+    const imgEl = card.querySelector('img');
+    if (imgEl) {
+      imgEl.style.cursor = 'zoom-in';
+      imgEl.addEventListener('click', () => {
+        openModal(src);
+      });
+    }
 
     quizGrid.appendChild(card);
   });
@@ -208,6 +234,14 @@ function initPhase2() {
         terminalHistory.scrollTop = terminalHistory.scrollHeight;
       }
     });
+
+    const rowImgEl = row.querySelector('.answer-image img') as HTMLImageElement;
+    if (rowImgEl) {
+      rowImgEl.style.cursor = 'zoom-in';
+      rowImgEl.addEventListener('click', () => {
+        openModal(src);
+      });
+    }
 
     answerList.appendChild(row);
   });
