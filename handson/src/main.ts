@@ -2,20 +2,8 @@ import './style.css';
 import { parseExif, analyzePixel } from './detector';
 
 const BASE = import.meta.env.BASE_URL;
-const IMAGES = [
-  `${BASE}images/image_01.png?v=2`,
-  `${BASE}images/image_02.png?v=2`,
-  `${BASE}images/image_03.png?v=2`,
-  `${BASE}images/image_04.jpg?v=2`,
-  `${BASE}images/image_05.jpg?v=2`,
-  `${BASE}images/image_06.jpg?v=2`,
-  `${BASE}images/image_07.jpg?v=2`,
-  `${BASE}images/image_08.jpg?v=2`,
-  `${BASE}images/image_09.jpg?v=2`,
-  `${BASE}images/image_10.jpg?v=2`,
-  `${BASE}images/image_11.jpg?v=2`,
-  `${BASE}images/image_12.jpg?v=2`,
-];
+let IMAGES: string[] = [];
+let aiImagesCount = 0;
 
 // State
 let phase: 1 | 2 = 1;
@@ -36,9 +24,53 @@ const phaseExplain = document.getElementById('phase-explain') as HTMLDivElement;
 const scoreDisplay = document.getElementById('score-display') as HTMLHeadingElement;
 const aiCountSpan = document.getElementById('ai-count') as HTMLSpanElement;
 
-// Since 1-6 are AI images
-const aiImagesCount = 6;
-if (aiCountSpan) aiCountSpan.textContent = aiImagesCount.toString();
+async function loadImagesConfig() {
+  try {
+    const res = await fetch(`${BASE}images/answers.txt?v=${Date.now()}`);
+    if (!res.ok) throw new Error("Failed to load answers.txt");
+    const text = await res.text();
+    const lines = text.trim().split("\n");
+    
+    IMAGES = [];
+    aiImagesCount = 0;
+    
+    lines.forEach((line) => {
+      const parts = line.split(":");
+      if (parts.length < 2) return;
+      const name = parts[0].trim();
+      const type = parts[1].trim();
+      
+      const ext = type === "ai (watermark)" ? ".png" : ".jpg";
+      const src = `${BASE}images/${name}${ext}?v=2`;
+      
+      IMAGES.push(src);
+      if (type.startsWith("ai")) {
+        aiImagesCount++;
+      }
+    });
+    
+    if (aiCountSpan) aiCountSpan.textContent = aiImagesCount.toString();
+  } catch (err) {
+    console.error("Error loading image configuration:", err);
+    // Fallback to static values if fetch fails
+    IMAGES = [
+      `${BASE}images/image_01.png?v=2`,
+      `${BASE}images/image_02.png?v=2`,
+      `${BASE}images/image_03.png?v=2`,
+      `${BASE}images/image_04.jpg?v=2`,
+      `${BASE}images/image_05.jpg?v=2`,
+      `${BASE}images/image_06.jpg?v=2`,
+      `${BASE}images/image_07.jpg?v=2`,
+      `${BASE}images/image_08.jpg?v=2`,
+      `${BASE}images/image_09.jpg?v=2`,
+      `${BASE}images/image_10.jpg?v=2`,
+      `${BASE}images/image_11.jpg?v=2`,
+      `${BASE}images/image_12.jpg?v=2`,
+    ];
+    aiImagesCount = 6;
+    if (aiCountSpan) aiCountSpan.textContent = aiImagesCount.toString();
+  }
+}
 
 function appendHistory(cmd: string, response: string) {
   const line = document.createElement('div');
@@ -257,4 +289,6 @@ terminalInput.addEventListener('keydown', async (e) => {
 });
 
 // Start
-initPhase1();
+loadImagesConfig().then(() => {
+  initPhase1();
+});

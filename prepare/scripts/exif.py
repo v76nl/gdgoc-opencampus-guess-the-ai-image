@@ -8,10 +8,14 @@ def apply_exif():
     out_dir = os.path.join(base_dir, "output_images")
     os.makedirs(out_dir, exist_ok=True)
 
-    images = sorted(os.listdir(raw_dir))
+    import math
+    images = sorted([f for f in os.listdir(raw_dir) if f.lower().endswith(('.png', '.jpg', '.jpeg'))])
+    N = len(images)
+    watermark_count = math.ceil(N / 4)
+    exif_count = math.ceil(N / 4)
     
     for i, img_name in enumerate(images):
-        if 3 <= i < 6:
+        if watermark_count <= i < watermark_count + exif_count:
             src_path = os.path.join(raw_dir, img_name)
             out_path = os.path.join(out_dir, img_name)
             

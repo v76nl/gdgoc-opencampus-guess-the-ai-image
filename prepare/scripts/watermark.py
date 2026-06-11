@@ -9,8 +9,11 @@ def apply_watermark():
     out_dir = os.path.join(base_dir, "output_images")
     os.makedirs(out_dir, exist_ok=True)
 
-    # Use first 3 images for watermark
-    images = sorted(os.listdir(raw_dir))
+    import math
+    images = sorted([f for f in os.listdir(raw_dir) if f.lower().endswith(('.png', '.jpg', '.jpeg'))])
+    N = len(images)
+    watermark_count = math.ceil(N / 4)
+    exif_count = math.ceil(N / 4)
     
     # create a fixed deterministic noise pattern for 800x800 using LCG
     length = 800 * 800 * 3
@@ -25,7 +28,7 @@ def apply_watermark():
         src_path = os.path.join(raw_dir, img_name)
         out_path = os.path.join(out_dir, img_name)
         
-        if i < 3:
+        if i < watermark_count:
             # Apply watermark
             img = cv2.imread(src_path)
             if img is not None:
@@ -33,8 +36,8 @@ def apply_watermark():
                 watermarked = np.clip(img_resized + noise, 0, 255).astype(np.uint8)
                 out_path_png = os.path.splitext(out_path)[0] + ".png"
                 cv2.imwrite(out_path_png, watermarked)
-        elif i >= 6:
-            # Copy unmodified (images 6 to 11)
+        elif i >= watermark_count + exif_count:
+            # Copy unmodified (images watermark_count + exif_count to N-1)
             img = cv2.imread(src_path)
             if img is not None:
                 cv2.imwrite(out_path, img)
