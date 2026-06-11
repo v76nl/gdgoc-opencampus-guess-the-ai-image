@@ -12,14 +12,14 @@ def apply_watermark():
     # Use first 3 images for watermark
     images = sorted(os.listdir(raw_dir))
     
-    # create a fixed deterministic noise pattern for 800x800
-    y_coords = np.arange(800).reshape(-1, 1, 1)
-    x_coords = np.arange(800).reshape(1, -1, 1)
-    c_coords = np.arange(3).reshape(1, 1, -1)
-    
-    val = np.sin(x_coords * 12.9898 + y_coords * 78.233 + c_coords * 37.719) * 43758.5453
-    frac = val - np.floor(val)
-    noise = (frac * 10.0) - 5.0
+    # create a fixed deterministic noise pattern for 800x800 using LCG
+    length = 800 * 800 * 3
+    noise_array = np.zeros(length, dtype=np.float32)
+    state = 42
+    for i in range(length):
+        state = (state * 1664525 + 1013904223) & 0xFFFFFFFF
+        noise_array[i] = (state / 4294967296.0) * 10.0 - 5.0
+    noise = noise_array.reshape((800, 800, 3))
     
     for i, img_name in enumerate(images):
         src_path = os.path.join(raw_dir, img_name)

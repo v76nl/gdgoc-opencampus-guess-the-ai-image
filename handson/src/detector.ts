@@ -42,27 +42,19 @@ export async function analyzePixel(imageEl: HTMLImageElement): Promise<{ score: 
             return { score: 0, detected: false };
           }
           
-          // Generate the same deterministic noise pattern used in Python
-          // y_coords: [height, 1, 1]
-          const y = tf.range(0, height).reshape([height, 1, 1]);
-          // x_coords: [1, width, 1]
-          const x = tf.range(0, width).reshape([1, width, 1]);
-          // c_coords: [1, 1, 3]
-          const c = tf.range(0, 3).reshape([1, 1, 3]);
-          
-          // val = sin(x * 12.9898 + y * 78.233 + c * 37.719) * 43758.5453
-          const xTerm = x.mul(12.9898);
-          const yTerm = y.mul(78.233);
-          const cTerm = c.mul(37.719);
-          
-          const sum = xTerm.add(yTerm).add(cTerm);
-          const val = sum.sin().mul(43758.5453);
-          
-          // frac = val - floor(val)
-          const frac = val.sub(val.floor());
-          
-          // noise = (frac * 10.0) - 5.0
-          const noise = frac.mul(10.0).sub(5.0);
+          // Generate the exact same deterministic noise pattern used in Python
+          const length = height * width * channels;
+          const noiseArray = new Float32Array(length);
+          let state = 42;
+          for (let i = 0; i < length; i++) {
+            // LCG matching Python: (state * 1664525 + 1013904223) & 0xFFFFFFFF
+            // Math.imul safely does 32-bit integer multiplication
+            state = (Math.imul(state, 1664525) + 1013904223) | 0;
+            // state is signed 32-bit. Convert to unsigned by >>> 0
+            const ustate = state >>> 0;
+            noiseArray[i] = (ustate / 4294967296.0) * 10.0 - 5.0;
+          }
+          const noise = tf.tensor3d(noiseArray, [height, width, channels]);
           
           // Compute correlation (mean of image * noise)
           const correlation = imgTensor.mul(noise).mean();
