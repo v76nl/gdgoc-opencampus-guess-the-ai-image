@@ -4,10 +4,13 @@ import * as tf from '@tensorflow/tfjs';
 export async function parseExif(imageEl: HTMLImageElement): Promise<{ result: string, detected: boolean, debugLog: string }> {
   try {
     let exifData: any = null;
+    let parseError: string = "";
     try {
-      exifData = await exifr.parse(imageEl, { makerNote: true });
+      const response = await fetch(imageEl.src);
+      const arrayBuffer = await response.arrayBuffer();
+      exifData = await exifr.parse(arrayBuffer, { makerNote: true });
     } catch (e) {
-      // Ignore parse error
+      parseError = String(e);
     }
     
     let isAiExif = false;
@@ -17,11 +20,18 @@ export async function parseExif(imageEl: HTMLImageElement): Promise<{ result: st
         isAiExif = true;
       }
     }
+    
+    const debugInfo = {
+      hasExifData: !!exifData,
+      keys: exifData ? Object.keys(exifData) : [],
+      makerNoteType: exifData?.MakerNote ? typeof exifData.MakerNote : 'undefined',
+      parseError
+    };
 
     if (isAiExif) {
-      return { result: "AIらしきメタデータを検知", detected: true, debugLog: JSON.stringify(exifData?.MakerNote || {}) };
+      return { result: "AIらしきメタデータを検知", detected: true, debugLog: JSON.stringify(debugInfo) };
     }
-    return { result: "AIらしきメタデータは見つかりませんでした", detected: false, debugLog: JSON.stringify(exifData?.MakerNote || {}) };
+    return { result: "AIらしきメタデータは見つかりませんでした", detected: false, debugLog: JSON.stringify(debugInfo) };
   } catch (error) {
     return { result: "メタデータの解析に失敗しました", detected: false, debugLog: String(error) };
   }
