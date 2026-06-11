@@ -34,8 +34,16 @@ export async function analyzePixel(imageEl: HTMLImageElement): Promise<{ score: 
     setTimeout(() => {
       try {
         const result = tf.tidy(() => {
-          // Convert image to tensor, shape [height, width, 3]
-          const imgTensor = tf.browser.fromPixels(imageEl).toFloat();
+          // Draw image to an offscreen canvas to ensure we read intrinsic size (e.g. 800x800)
+          // instead of the CSS-rendered size (e.g. 518x518)
+          const canvas = document.createElement('canvas');
+          canvas.width = imageEl.naturalWidth || 800;
+          canvas.height = imageEl.naturalHeight || 800;
+          const ctx = canvas.getContext('2d', { willReadFrequently: true });
+          ctx?.drawImage(imageEl, 0, 0, canvas.width, canvas.height);
+          
+          // Convert canvas to tensor, shape [height, width, 3]
+          const imgTensor = tf.browser.fromPixels(canvas).toFloat();
           const [height, width, channels] = imgTensor.shape;
           
           if (channels !== 3 || height === 0 || width === 0) {
