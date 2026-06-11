@@ -17,12 +17,6 @@ export async function parseExif(imageEl: HTMLImageElement): Promise<{ result: st
         isAiExif = true;
       }
     }
-    
-    // Fallback: forcefully detect based on known filenames for the hands-on
-    const src = imageEl.src;
-    if (src.includes('image_04') || src.includes('image_05') || src.includes('image_06')) {
-      isAiExif = true;
-    }
 
     if (isAiExif) {
       return { result: "AIらしきメタデータを検知", detected: true };
@@ -38,13 +32,53 @@ export async function analyzePixel(imageEl: HTMLImageElement): Promise<{ score: 
   
   return new Promise((resolve) => {
     setTimeout(() => {
-      const src = imageEl.src;
-      // Watermarks were applied to images 01, 02, 03
-      const isWatermarked = src.includes('image_01') || src.includes('image_02') || src.includes('image_03');
-      
-      const score = isWatermarked ? 0.92 + Math.random() * 0.07 : 0.1 + Math.random() * 0.3;
-      const detected = score > 0.8; 
-      resolve({ score, detected });
-    }, 500);
+      try {
+        const result = tf.tidy(() => {
+          // Convert image to tensor, shape [height, width, 3]
+          const imgTensor = tf.browser.fromPixels(imageEl).toFloat();
+          const [height, width, channels] = imgTensor.shape;
+          
+          if (channels !== 3 || height === 0 || width === 0) {
+            return { score: 0, detected: false };
+          }
+          
+          // Generate the same deterministic noise pattern used in Python
+          // y_coords: [height, 1, 1]
+          const y = tf.range(0, height).reshape([height, 1, 1]);
+          // x_coords: [1, width, 1]
+          const x = tf.range(0, width).reshape([1, width, 1]);
+          // c_coords: [1, 1, 3]
+          const c = tf.range(0, 3).reshape([1, 1, 3]);
+          
+          // val = sin(x * 12.9898 + y * 78.233 + c * 37.719) * 43758.5453
+          const xTerm = x.mul(12.9898);
+          const yTerm = y.mul(78.233);
+          const cTerm = c.mul(37.719);
+          
+          const sum = xTerm.add(yTerm).add(cTerm);
+          const val = sum.sin().mul(43758.5453);
+          
+          // frac = val - floor(val)
+          const frac = val.sub(val.floor());
+          
+          // noise = (frac * 10.0) - 5.0
+          const noise = frac.mul(10.0).sub(5.0);
+          
+          // Compute correlation (mean of image * noise)
+          const correlation = imgTensor.mul(noise).mean();
+          const score = correlation.dataSync()[0];
+          
+          return { score, detected: false };
+        });
+        
+        // Expected score for watermarked is ~8.3. Unwatermarked is ~0.0.
+        // Threshold set to 2.0 to be safe.
+        const detected = result.score > 2.0;
+        resolve({ score: result.score, detected });
+      } catch (e) {
+        console.error(e);
+        resolve({ score: 0, detected: false });
+      }
+    }, 100); // UI wait
   });
 }
