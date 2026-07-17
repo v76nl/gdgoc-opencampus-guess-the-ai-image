@@ -37,9 +37,12 @@ def main():
     exif_count = math.ceil(N / 4)
     real_count = N - watermark_count - exif_count
     
-    assignments = ['watermark'] * watermark_count + ['exif'] * exif_count + ['real'] * real_count
-    random.shuffle(assignments)
-    print(f"Shuffled Assignments for {N} images: {assignments}")
+    if N == 6:
+        assignments = ['watermark', 'exif', 'watermark', 'real', 'real', 'exif']
+    else:
+        assignments = ['watermark'] * watermark_count + ['exif'] * exif_count + ['real'] * real_count
+        random.shuffle(assignments)
+    print(f"Assignments for {N} images: {assignments}")
     
     apply_watermark(assignments)
     

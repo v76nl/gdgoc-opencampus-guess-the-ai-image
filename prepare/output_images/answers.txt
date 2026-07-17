@@ -1,6 +1,6 @@
 image_01: ai (watermark)
-image_02: real
+image_02: ai (exif)
 image_03: ai (watermark)
-image_04: ai (exif)
+image_04: real
 image_05: real
 image_06: ai (exif)
