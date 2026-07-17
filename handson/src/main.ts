@@ -9,6 +9,7 @@ let aiImagesCount = 0;
 let phase: 1 | 2 = 1;
 let isDevMode = false;
 const labels: Record<string, 'AI' | 'Real' | null> = {};
+const actualTypes: Record<string, 'ai (watermark)' | 'ai (exif)' | 'real'> = {};
 
 // DOM Elements
 const quizGrid = document.getElementById('quiz-grid') as HTMLDivElement;
@@ -56,12 +57,13 @@ async function loadImagesConfig() {
       const parts = line.split(":");
       if (parts.length < 2) return;
       const name = parts[0].trim();
-      const type = parts[1].trim();
+      const type = parts[1].trim().toLowerCase() as 'ai (watermark)' | 'ai (exif)' | 'real';
       
       const ext = type === "ai (watermark)" ? ".png" : ".jpg";
       const src = `${BASE}images/${name}${ext}?v=2`;
       
       IMAGES.push(src);
+      actualTypes[src] = type;
       if (type.startsWith("ai")) {
         aiImagesCount++;
       }
@@ -85,7 +87,28 @@ async function loadImagesConfig() {
       `${BASE}images/image_11.jpg?v=2`,
       `${BASE}images/image_12.jpg?v=2`,
     ];
-    aiImagesCount = 6;
+    const fallbackTypes: Record<number, 'ai (watermark)' | 'ai (exif)' | 'real'> = {
+      0: 'ai (watermark)',
+      1: 'real',
+      2: 'ai (watermark)',
+      3: 'ai (exif)',
+      4: 'real',
+      5: 'ai (exif)',
+      6: 'real',
+      7: 'real',
+      8: 'real',
+      9: 'real',
+      10: 'real',
+      11: 'real'
+    };
+    aiImagesCount = 0;
+    IMAGES.forEach((src, idx) => {
+      const type = fallbackTypes[idx] || 'real';
+      actualTypes[src] = type;
+      if (type.startsWith("ai")) {
+        aiImagesCount++;
+      }
+    });
     if (aiCountSpan) aiCountSpan.textContent = aiImagesCount.toString();
   }
 }
@@ -149,7 +172,8 @@ function initPhase2() {
   let correctCount = 0;
 
   IMAGES.forEach((src, index) => {
-    const isAiActual = index < aiImagesCount;
+    const actualType = actualTypes[src] || 'real';
+    const isAiActual = actualType.startsWith('ai');
     const userLabel = labels[src];
     
     if (
@@ -164,8 +188,10 @@ function initPhase2() {
     const translatedUserLabel = userLabel === 'AI' ? 'AI' : userLabel === 'Real' ? '本物' : 'なし';
     
     let actualLabel = '';
-    if (isAiActual) {
-      actualLabel = index < 3 ? '(Actual: AI (Watermark))' : '(Actual: AI (Meta))';
+    if (actualType === 'ai (watermark)') {
+      actualLabel = '(Actual: AI (Watermark))';
+    } else if (actualType === 'ai (exif)') {
+      actualLabel = '(Actual: AI (Exif))';
     } else {
       actualLabel = '(Actual: 本物)';
     }
@@ -178,7 +204,7 @@ function initPhase2() {
         <h3>あなたの回答: ${translatedUserLabel} ${isDevMode ? actualLabel : ''}</h3>
         
         <div class="dashboard-panel">
-          <button class="btn btn-exif">メタデータ解析</button>
+          <button class="btn btn-exif">Exif解析</button>
           <div class="result-text exif-result"></div>
         </div>
 
