@@ -31,11 +31,11 @@ export async function parseExif(imageEl: HTMLImageElement): Promise<{ result: st
     };
 
     if (isAiExif) {
-      return { result: "AIらしきメタデータを検知", detected: true, debugLog: JSON.stringify(debugInfo) };
+      return { result: "AIらしきExifを検知", detected: true, debugLog: JSON.stringify(debugInfo) };
     }
-    return { result: "AIらしきメタデータは見つかりませんでした", detected: false, debugLog: JSON.stringify(debugInfo) };
+    return { result: "AIらしきExifは見つかりませんでした", detected: false, debugLog: JSON.stringify(debugInfo) };
   } catch (error) {
-    return { result: "メタデータの解析に失敗しました", detected: false, debugLog: String(error) };
+    return { result: "Exifの解析に失敗しました", detected: false, debugLog: String(error) };
   }
 }
 
